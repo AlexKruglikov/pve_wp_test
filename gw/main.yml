@@ -1,9 +1,4 @@
 ---
-#- name: Call Create VM Playbook
-#  ansible.builtin.import_playbook: ./create.yml
-#  vars:
-#    target_group: gw
-
 - name: Configure firewall
   hosts: gw
   gather_facts: no

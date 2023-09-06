@@ -1,7 +1,6 @@
 ---
 - name: Cloning VMs from template 
   hosts: vm_create_group
-#  ignore_unreachable: yes
   gather_facts: no
   become: True
   tasks:
