@@ -1,0 +1,44 @@
+version: '3'
+services: 
+    #######  Database service  #######
+    db:
+        image: mysql:5.7
+        volumes:
+            # This gives us persistence
+            - db_data:/var/lib/mysql
+        # if the server reboots the container restarts
+        restart: always
+        # define your mysql environment variables
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+        networks:
+            - wpsite
+    #######  Wordpress service  #######
+    wordpress:
+        depends_on:
+            - db
+        image: wordpress:latest
+        ports:
+            # local:8000, container:80
+            - '8000:80'
+        restart: always
+        # okay so we want the WP install in the container to sync locally here
+        # Mapping './' (local current folder) to '/var/www/html' (container's web root folder as we're using apache)
+        volumes: ['./:/var/www/html']
+        environment: 
+            # the host is going to be the db service by mysql above, port 3306 is the default for mysql
+            # we've already setup the DB user above
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_USER: wordpress
+            WORDPRESS_DB_PASSWORD: wordpress
+        networks:
+            - wpsite
+            # map the volume of db_data (in service db above) and the network of 'wpsite'
+networks: 
+    wpsite:
+volumes:
+    db_data:
+# Now go and run docker-compose up -d

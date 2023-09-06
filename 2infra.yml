@@ -1,0 +1,15 @@
+---
+- name: Configure VM GW
+  ansible.builtin.import_playbook: gw/main.yml
+
+- name: Configure VM Nginx
+  ansible.builtin.import_playbook: nginx/main.yml
+
+- name: Configure VM Docker
+  ansible.builtin.import_playbook: docker/main.yml
+
+#  vars:
+#    target_group: "nginx"
+
+
+

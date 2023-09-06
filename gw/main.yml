@@ -1,0 +1,41 @@
+---
+- name: Call Create VM Playbook
+  ansible.builtin.import_playbook: ./create.yml
+  vars:
+    target_group: gw
+
+- name: Configure firewall
+  hosts: gw
+  gather_facts: no
+  become: True
+  tasks:
+
+  - name: Wait for /var/lib/dpkg/lock-frontend to be released 
+    shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
+  - ansible.posix.sysctl:
+      name: net.ipv4.ip_forward
+      value: '1'
+      sysctl_set: true
+      state: present
+      reload: true
+      
+  - name: install iptables-persistent
+    apt: 
+      name: iptables-persistent 
+      update_cache: yes 
+    register: apt_res
+    retries: 5
+    until: apt_res is success  
+
+  - name: create iptables fw script
+    template:
+      src: templates/iptables.sh.j2
+      dest: "/tmp/iptables.sh"
+      owner: root
+      group: root
+      mode: '0755'
+      
+  - name: Execute the script
+    command: sh /tmp/iptables.sh      
+      

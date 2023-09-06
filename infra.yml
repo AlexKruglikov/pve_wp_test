@@ -1,0 +1,10 @@
+---
+- name: Create VMs
+  ansible.builtin.import_playbook: ./1infra.yml
+
+- name: Configure VMs
+  ansible.builtin.import_playbook: ./2infra.yml
+
+
+
+

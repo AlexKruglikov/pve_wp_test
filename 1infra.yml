@@ -1,0 +1,23 @@
+---
+- name: Create VM GW
+  ansible.builtin.import_playbook: ./create_vm.yml
+  vars:
+    target_group: gw 
+
+- name: Create VM Nginx
+  ansible.builtin.import_playbook: ./create_vm.yml
+  vars:
+    target_group: nginx 
+
+- name: Create VM Docker
+  ansible.builtin.import_playbook: ./create_vm.yml
+  vars:
+    target_group: docker
+
+
+
+#  vars:
+#    target_group: "nginx"
+
+
+

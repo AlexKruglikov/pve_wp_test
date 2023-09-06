@@ -1,0 +1,26 @@
+---
+- name: Configure "{{ target_group }}" 
+  hosts: "{{ target_group }}"
+  ignore_unreachable: yes
+  gather_facts: no
+  become: True
+  tasks:
+  - name: Clone "{{ item.key }}" from template "{{ template }}"
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      clone: "{{ template }}"
+#      vmid: "{{ clone_from_id }}"
+      newid: "{{ item.value.vmid }}"
+      full: "{{ full }}"
+      name: "{{ item.key }}"
+      bootdisk: "virtio0"
+      format: 'unspecified'
+      timeout: 600
+#    async: 300
+#    poll: 0
+    delegate_to: "{{ proxmox }}"
+

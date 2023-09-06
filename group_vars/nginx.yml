@@ -1,0 +1,11 @@
+---
+# Vars for VM Nginx
+cores: 1
+memory_size: 1024
+cpu: host
+balloon: 512
+scsihw: 'virtio-scsi-pci'
+virtio: '{"scsi0":"rbd_nvme_general:16,cache=writeback,discard=on"}'
+ostype: 'l26'
+net: '{"net0":"virtio,bridge=vmbr1"}'
+proxmox: "{{ groups['proxmox'][0] }}"
