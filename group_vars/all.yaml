@@ -25,10 +25,16 @@ sshkeys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCUkbulLsXsB3XuQ0R3D3cjfclzAe4oes
 
 template: "9000"
 clone_from_id: "9000"
-full: true
+full: false 
 backend_subnets: 
   - "10.0.10.0/24"
   - "10.0.20.0/24"
 wait_vm_delay: 10
 wait_vm_timeout: 300
 
+mysql_vars:
+  db_ip: 10.0.10.20
+  db_user: wordpress
+  db_root_password: password
+  db_database: wordpress
+  db_password: wordpress

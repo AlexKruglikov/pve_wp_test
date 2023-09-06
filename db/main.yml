@@ -1,7 +1,12 @@
 ---
-- name: Configure docker
-  hosts: docker
-  gather_facts: false
+#- name: Call Create VM Playbook
+#  ansible.builtin.import_playbook: ./create.yml
+#  vars:
+#    target_group: db 
+
+- name: Configure db
+  hosts: db 
+  gather_facts: no
   become: True
   tasks:
 
@@ -11,22 +16,23 @@
       dest: /tmp/docker-compose.yml
       owner: root
       group: root
-      mode: '1777'
+      mode: '177'
+        
+#  - name: Copy Docker Compose files
+#    ansible.builtin.copy:
+#      src: files/docker-compose.yml
+#      dest: /tmp/docker-compose.yml
 
   - name: Wait for /var/lib/dpkg/lock-frontend to be released 
     ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
 
   - name: Install Docker
     ansible.builtin.apt: 
-      name: 
-       - docker
-       - docker-compose 
-      update_cache: no 
+      name: docker-compose 
+      update_cache: yes
     register: apt_res
     retries: 5
     until: apt_res is success
-    async: 60
-    poll: 60
 
   # use files parameter to use multiple docker-compose.yml files
   - name: Deploy Docker Compose stack

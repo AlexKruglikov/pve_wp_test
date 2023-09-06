@@ -1,8 +1,8 @@
 ---
-#- name: Create VM Nginx
-#  ansible.builtin.import_playbook: ./create.yml
-#  vars:
-#    target_group: "nginx"
+- name: Create VM Nginx
+  ansible.builtin.import_playbook: ./create.yml
+  vars:
+    target_group: "nginx"
 
 - name: Configure nginx lb
   hosts: nginx

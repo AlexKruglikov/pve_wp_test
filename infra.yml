@@ -1,10 +1,16 @@
 ---
 - name: Create VMs
-  ansible.builtin.import_playbook: ./1infra.yml
+  ansible.builtin.import_playbook: ./create_vm.yml
 
-- name: Configure VMs
-  ansible.builtin.import_playbook: ./2infra.yml
+- name: Configure VM GW
+  ansible.builtin.import_playbook: gw/main.yml
 
+- name: Configure VM Nginx
+  ansible.builtin.import_playbook: nginx/main.yml
 
+- name: Configure VM db
+  ansible.builtin.import_playbook: db/main.yml
 
+- name: Configure VM Docker
+  ansible.builtin.import_playbook: docker/main.yml
 

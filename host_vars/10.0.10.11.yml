@@ -1,6 +1,7 @@
-
+---
 item:
   key: docker1011
   value:
     vmid: 1011
     ipconfig: '{"ipconfig0":"ip=10.0.10.11/24,gw=10.0.10.1"}'
+    interface: net0

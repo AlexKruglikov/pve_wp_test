@@ -1,8 +1,8 @@
 ---
-- name: Call Create VM Playbook
-  ansible.builtin.import_playbook: ./create.yml
-  vars:
-    target_group: gw
+#- name: Call Create VM Playbook
+#  ansible.builtin.import_playbook: ./create.yml
+#  vars:
+#    target_group: gw
 
 - name: Configure firewall
   hosts: gw
@@ -10,32 +10,33 @@
   become: True
   tasks:
 
-  - name: Wait for /var/lib/dpkg/lock-frontend to be released 
-    shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+  - name: Wait for /var/lib/dpkg/lock-frontend to be released on "{{ inventory_hostname }}"
+    ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
 
-  - ansible.posix.sysctl:
+  - name: Enabling ipv4_forwarding on "{{ inventory_hostname }}"
+    ansible.posix.sysctl:
       name: net.ipv4.ip_forward
       value: '1'
       sysctl_set: true
       state: present
       reload: true
       
-  - name: install iptables-persistent
-    apt: 
+  - name: Install iptables-persistent on "{{ inventory_hostname }}"
+    ansible.builtin.apt: 
       name: iptables-persistent 
       update_cache: yes 
     register: apt_res
     retries: 5
     until: apt_res is success  
 
-  - name: create iptables fw script
-    template:
+  - name: Create iptables fw script on "{{ inventory_hostname }}"
+    ansible.builtin.template:
       src: templates/iptables.sh.j2
       dest: "/tmp/iptables.sh"
       owner: root
       group: root
       mode: '0755'
       
-  - name: Execute the script
-    command: sh /tmp/iptables.sh      
+  - name: Execute fw script on "{{ inventory_hostname }}"
+    ansible.builtin.command: sh /tmp/iptables.sh      
       

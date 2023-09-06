@@ -5,5 +5,5 @@ item:
      vmid: 1000
      net: '{"net0":"virtio,bridge=vmbr0", "net1":"virtio,bridge=vmbr1"}'
      ipconfig: '{"ipconfig0":"ip=dhcp", "ipconfig1": "ip=10.0.10.1/24"}'
-        
+     interface: net1   
         
