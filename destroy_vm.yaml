@@ -1,0 +1,29 @@
+---
+- name: Destroy deployment  
+  hosts: vm_create_group
+  gather_facts: no
+  become: True
+  tasks:
+  - name: Stop VMs
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ item.value.vmid }}"
+      state: stopped 
+    delegate_to: "{{ proxmox }}"
+
+  - name: Destroy VMs
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ item.value.vmid }}"
+      state: absent
+    delegate_to: "{{ proxmox }}"
+
+
