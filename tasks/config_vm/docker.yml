@@ -1,33 +1,32 @@
 ---
-- name: Configure db
-  hosts: db 
-  gather_facts: no
+- name: Configure docker
+  hosts: docker
+  gather_facts: no 
   become: True
   tasks:
 
   - name: Create docker-compose.yml for "{{ inventory_hostname }}"
     ansible.builtin.template:
-      src: templates/docker-compose.yml.j2
+      src: ../../templates/docker/docker-compose.yml.j2
       dest: /tmp/docker-compose.yml
       owner: root
       group: root
-      mode: '177'
-        
-#  - name: Copy Docker Compose files
-#    ansible.builtin.copy:
-#      src: files/docker-compose.yml
-#      dest: /tmp/docker-compose.yml
+      mode: '1777'
 
   - name: Wait for /var/lib/dpkg/lock-frontend to be released 
     ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
 
   - name: Install Docker
     ansible.builtin.apt: 
-      name: docker-compose 
-      update_cache: yes
+      name: 
+       - docker
+       - docker-compose 
+      update_cache: no 
     register: apt_res
     retries: 5
     until: apt_res is success
+    async: 60
+    poll: 60
 
   # use files parameter to use multiple docker-compose.yml files
   - name: Deploy Docker Compose stack

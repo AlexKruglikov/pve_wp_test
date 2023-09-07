@@ -1,50 +1,16 @@
 ---
-- name: Create VM Nginx
-  ansible.builtin.import_playbook: ./create.yml
-  vars:
-    target_group: "nginx"
+- name: Create VMs
+  ansible.builtin.import_playbook: tasks/create_vm.yml
 
-- name: Configure nginx lb
-  hosts: nginx
-  become: True
-  tasks:
-  - name: Wait for reboot '{{ inventory_hostname }}'
-    ansible.builtin.wait_for:
-      port: 22
-      host: '{{ inventory_hostname }}'
-      search_regex: OpenSSH
-      delay: "{{ wait_vm_delay }}" 
-      timeout: "{{ wait_vm_timeout }}"
-    connection: local
+- name: Configure VM GW
+  ansible.builtin.import_playbook: tasks/config_vm/gw.yml
 
-  - name: Wait for /var/lib/dpkg/lock-frontend to be released 
-    ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
-  
-  - name: install nginx
-    ansible.builtin.apt: 
-      name: nginx
-      update_cache: yes 
-    register: apt_res
-    retries: 5
-    until: apt_res is success
+- name: Configure VM Nginx
+  ansible.builtin.import_playbook: tasks/config_vm/nginx.yml
 
-  - name: Create Nginx Config for ALB
-    ansible.builtin.template:
-      src: templates/alb.j2
-      dest: "/etc/nginx/sites-available/alb"
-      owner: root
-      group: root
-      mode: '0644'
+- name: Configure VM db
+  ansible.builtin.import_playbook: tasks/config_vm/db.yml
 
-  - name: Link to enable configuration
-    ansible.builtin.file: >
-          dest=/etc/nginx/sites-enabled/default
-          src=/etc/nginx/sites-available/alb
-          state=link
-
-  - name: Restart Nginx
-    ansible.builtin.service: 
-      name: nginx 
-      state: restarted
-
+- name: Configure VM Docker
+  ansible.builtin.import_playbook: tasks/config_vm/docker.yml
 

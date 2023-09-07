@@ -1,6 +1,7 @@
 ---
 - name: Configure nginx lb
   hosts: nginx
+  gather_facts: no
   become: True
   tasks:
   - name: Wait for reboot '{{ inventory_hostname }}'
@@ -25,7 +26,7 @@
 
   - name: Create Nginx Config for ALB
     ansible.builtin.template:
-      src: templates/alb.j2
+      src: ../../templates/nginx/alb.j2
       dest: "/etc/nginx/sites-available/alb"
       owner: root
       group: root

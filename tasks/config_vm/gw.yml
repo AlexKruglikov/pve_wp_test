@@ -26,7 +26,7 @@
 
   - name: Create iptables fw script on "{{ inventory_hostname }}"
     ansible.builtin.template:
-      src: templates/iptables.sh.j2
+      src: ../../templates/gw/iptables.sh.j2
       dest: "/tmp/iptables.sh"
       owner: root
       group: root
