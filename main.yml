@@ -1,16 +1,44 @@
 ---
-- name: Create VMs
-  ansible.builtin.import_playbook: tasks/create_vm.yml
+- name: Create VM's
+  hosts: vm_create_group 
+  gather_facts: no
+  become: True
+              
+  roles:
+#  - { role: create_vm, when: ansible_somevar == 'some_condition' }
+  - { role: create_vm }
 
-- name: Configure VM GW
-  ansible.builtin.import_playbook: tasks/config_vm/gw.yml
+- name: Configure gw
+  hosts: gw
+  gather_facts: no
+  become: True
+  roles:
+  - { role: configure_gw }
 
-- name: Configure VM Nginx
-  ansible.builtin.import_playbook: tasks/config_vm/nginx.yml
+- name: Install docker
+  hosts: docker_group 
+  gather_facts: no
+  become: True
+  roles:
+  - { role: install_docker }
 
-- name: Configure VM db
-  ansible.builtin.import_playbook: tasks/config_vm/db.yml
+- name: Install mysql
+  hosts: db
+  gather_facts: no
+  become: True
+  roles:
+  - { role: install_mysql }
 
-- name: Configure VM Docker
-  ansible.builtin.import_playbook: tasks/config_vm/docker.yml
+- name: Install wordpress
+  hosts: wordpress
+  gather_facts: no
+  become: True
+  roles:
+  - { role: install_wordpress }
 
+- name: Install nginx
+  hosts: nginx
+  gather_facts: no
+  become: True
+  roles:
+  - { role: install_nginx }

@@ -1,0 +1,40 @@
+---
+- name: Install docker
+  hosts: docker_group
+#  gather_facts: no 
+  become: True
+  vars:
+    package_names:
+      - docker-compose
+  tasks:
+
+  - name: Wait for /var/lib/dpkg/lock-frontend to be released 
+    ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
+  - name: "Check if pkg is installed or not on Debian Linux family"
+    ansible.builtin.command: dpkg-query -l "{{ pkg_name }}"
+    loop: "{{ package_names }}"
+    loop_control:
+      label: "{{ pkg_name }}"
+      loop_var: pkg_name
+    register: debian_package_check
+    ignore_errors: true
+    when: ansible_facts['os_family'] == "Debian"
+
+  - name: Install Docker, Docker-compose
+    ansible.builtin.apt: 
+      name: "{{ pkg_name }}"
+#      - docker-compose 
+      update_cache: true
+      state: latest
+#      only_upgrade: true
+      lock_timeout: 120
+    with_items: "{{ package_names }}"
+    loop_control:
+       loop_var: pkg_name
+    register: apt_res
+    retries: 5
+    until: apt_res is success
+#    async: 60
+#    poll: 60
+    when: debian_package_check is failed

@@ -7,5 +7,5 @@ balloon: 512
 scsihw: 'virtio-scsi-pci'
 virtio: '{"scsi0":"rbd_nvme_general:16,cache=writeback,discard=on"}'
 ostype: 'l26'
-net: '{"net0":"virtio,bridge=vmbr1"}'
+net: '{"net0":"virtio,bridge=vmbr0,tag=2001"}'
 proxmox: "{{ groups['proxmox'][0] }}"

@@ -7,9 +7,10 @@ balloon: 512
 scsihw: 'virtio-scsi-pci'
 virtio: '{"scsi0":"size=8G,cache=writeback,discard=on"}'
 ostype: 'l26'
-net: '{"net0":"virtio,bridge=vmbr1"}'
-wait_vm_timeout: 280
-wait_vm_delay: 30
+net: '{"net0":"virtio,bridge=vmbr0,tag=2001"}'
+wait_vm_timeout: 300
+wait_vm_delay: 5
+ 
 
 wordpress_image_id: latest
 

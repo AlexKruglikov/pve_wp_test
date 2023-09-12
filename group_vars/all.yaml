@@ -21,15 +21,18 @@ api_token_secret: !vault |
 ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
 ansible_user: ubuntu
 ansible_ssh_private_key_file: ~/wp-project/.ssh/key
+
 sshkeys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCUkbulLsXsB3XuQ0R3D3cjfclzAe4oes/9W3dbrmPP5Cq3Lt7FqpGfdIohnmEwhsdO0tWgV+hpw7ngXEpMnTrbXh6XDdWwfLONdZa0CsXMWr3PjBcrDDz+do9GvKR6gqLyimqmNu2T1jzPSYSpeLRj5ev1zz8u+BuP+Oe297iLWF3JqF7xQ3BcCZ82YmzNF3ndXA/ZTEEYOOOu1DY8k+KZSgZKMCDbXkhQ48Y6xHf80bREjP+RVxMJIfMjBZWM5MRJ9LRp69fH4E3OTRZ84Ju37tYxpce0t6C4fl/73C56TWXKum1DDCsDkwGVUoLnJI9q/8TqYUUoCqaHRH67dwmX someuser@somehost"
 
 template: "9000"
 clone_from_id: "9000"
 full: false 
+
+
 backend_subnets: 
   - "10.0.10.0/24"
   - "10.0.20.0/24"
-wait_vm_delay: 10
+wait_vm_delay: 5 
 wait_vm_timeout: 300
 
 mysql_vars:
@@ -38,3 +41,10 @@ mysql_vars:
   db_root_password: password
   db_database: wordpress
   db_password: wordpress
+
+defaults:
+  cores: 1
+  memory_size: 1024
+  balloon: 512
+
+

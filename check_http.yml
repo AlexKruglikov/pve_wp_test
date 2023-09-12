@@ -1,0 +1,11 @@
+---
+- hosts: wordpress
+  vars:
+    http_port: 8000
+ 
+  tasks:
+    - name: Confirm that 200 OK response is returned
+      uri:
+        url: "http://{{ ansible_host }}:{{ http_port }}/wp-admin/install.php"
+#       http://10.0.10.12:8000/wp-admin/install.php
+        status_code: 200

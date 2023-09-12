@@ -1,0 +1,73 @@
+---
+- name: Destroy deployment  
+  hosts: vm_create_group
+  gather_facts: no
+  become: True
+  tasks:
+  
+  - name: Get VM status
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ vmid }}"
+      state: current 
+    register: vm
+    delegate_to: "{{ proxmox }}"
+
+  - name: Print var
+    debug:
+      msg: "{{ vm.status }}"
+
+  - name: Stopping VM's...
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ vmid }}"
+      state: stopped
+      force: true 
+    register: tmp_state
+    retries: 2
+    until: tmp_state is changed 
+    ignore_errors: true
+    when: vm.status == "running"
+    delegate_to: "{{ proxmox }}"
+
+  - name: Get VM status
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ vmid }}"
+      state: current
+    register: vm
+    delegate_to: "{{ proxmox }}"
+
+  - name: Print var
+    debug:
+      msg: "{{ vm.status }}"
+
+  - name: Destroy VMs
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ vmid }}"
+      state: absent
+    when: vm.status == "stopped"
+    register: result
+    until: "result is not failed"
+    retries: 10
+    delay: 5
+    delegate_to: "{{ proxmox }}"
+
+

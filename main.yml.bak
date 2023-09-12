@@ -1,0 +1,26 @@
+---
+- name: Create VM's
+  ansible.builtin.import_playbook: tasks/create_vm.yml
+
+- name: Config NIC
+  ansible.builtin.import_playbook: tasks/config_NIC.yml
+
+- name: Boot VM's
+  ansible.builtin.import_playbook: tasks/start_vm.yml
+
+
+- name: Configure VM Gw
+  ansible.builtin.import_playbook: tasks/config_vm/gw.yml
+
+- name: Install Docker
+  ansible.builtin.import_playbook: tasks/config_vm/docker_install.yml
+
+- name: Configure VM db
+  ansible.builtin.import_playbook: tasks/config_vm/db.yml
+
+- name: Configure VM wordpress
+  ansible.builtin.import_playbook: tasks/config_vm/wordpress.yml
+
+- name: Configure VM Nginx
+  ansible.builtin.import_playbook: tasks/config_vm/nginx.yml
+

@@ -1,0 +1,40 @@
+---
+- name: Configure net for gw 
+  hosts: gw 
+  gather_facts: no
+  become: True
+  tasks:
+
+  - name: Connect NIC net1 to bridge id 1 
+    community.general.proxmox_nic:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      vmid: "{{ item.value.vmid }}"
+      interface: "{{ item.value.interface }}" 
+      bridge:  "{{ item.value.bridge }}"
+      tag: "{{ item.value.tag }}"
+      firewall: false
+    loop: "{{ net_settings }}" 
+    delegate_to: "{{ proxmox }}"
+        
+  - name: Update Network Settings "{{ inventory_hostname }}" 
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      vmid: "{{ item.value.vmid }}"
+      cores: '{{ cores | default(defaults.cores) }}'
+      memory: '{{ memory_size | default(defaults.memory_size) }}'
+      balloon: '{{ balloon | default(defaults.balloon) }}'
+      net: '{{ net  }}'
+      ipconfig: '{{ item.value.ipconfig }}'
+      sshkeys: '{{ sshkeys | default(defaults.sshkeys) }}'
+      onboot: true
+      update: true
+    delegate_to: "{{ proxmox }}"
+
+

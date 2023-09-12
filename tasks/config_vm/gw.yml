@@ -5,6 +5,16 @@
   become: True
   tasks:
 
+  - name: Wait for the reboot and reconnect "{{ inventory_hostname }}"
+    ignore_unreachable: no
+    ansible.builtin.wait_for:
+      port: 22
+      host: "{{ inventory_hostname }}"
+      search_regex: OpenSSH
+      delay: "{{ wait_vm_delay }}" 
+      timeout: "{{ wait_vm_timeout }}"
+    connection: local
+
   - name: Wait for /var/lib/dpkg/lock-frontend to be released on "{{ inventory_hostname }}"
     ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
 
@@ -28,9 +38,9 @@
     ansible.builtin.template:
       src: ../../templates/gw/iptables.sh.j2
       dest: "/tmp/iptables.sh"
-      owner: root
-      group: root
-      mode: '0755'
+#      owner: root
+#      group: root
+#      mode: '0755'
       
   - name: Execute fw script on "{{ inventory_hostname }}"
     ansible.builtin.command: sh /tmp/iptables.sh      

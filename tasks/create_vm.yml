@@ -12,79 +12,58 @@
       api_host: "{{ api_host }}"
       node: "{{ node }}"
       clone: "{{ template }}"
-      newid: "{{ item.value.vmid }}"
+      newid: "{{ vmid }}"
       full: "{{ full }}"
-      name: "{{ item.key }}"
+      name: "{{ name }}"
       bootdisk: "virtio0"
+#      net: '{{ item.value.net | default(defaults.net) }}'
+      ipconfig: '{{ ipconfig | default(defaults.ipconfig) }}'
       format: 'unspecified'
       timeout: 600
     delegate_to: "{{ proxmox }}"
-
-  - name: Connect NIC net1 to bridge id 1 
-    community.general.proxmox_nic:
-      api_user: "{{ api_user }}"
-      api_token_id: "{{ api_token_id }}"
-      api_token_secret: "{{ api_token_secret }}"
-      api_host: "{{ api_host }}"
-      vmid: "{{ item.value.vmid }}"
-      interface: "{{ item.value.interface }}" 
-      bridge: vmbr1
-      firewall: false
-    delegate_to: "{{ proxmox }}"
-        
-  - name: Update Network Settings "{{ inventory_hostname }}" 
-    community.general.proxmox_kvm:
-      api_user: "{{ api_user }}"
-      api_token_id: "{{ api_token_id }}"
-      api_token_secret: "{{ api_token_secret }}"
-      api_host: "{{ api_host }}"
-      node: "{{ node }}"
-      vmid: "{{ item.value.vmid }}"
-      cores: '{{ cores | default(defaults.cores) }}'
-      memory: '{{ memory_size | default(defaults.memory_size) }}'
-      balloon: '{{ balloon | default(defaults.balloon) }}'
-      net: '{{ net | default(defaults.net) }}'
-      ipconfig: '{{ item.value.ipconfig | default(defaults.ipconfig) }}'
-      sshkeys: '{{ sshkeys | default(defaults.sshkeys) }}'
-      onboot: true
-      update: true
-    delegate_to: "{{ proxmox }}"
-
-  - name: Stop VM "{{ inventory_hostname }}"
-    community.general.proxmox_kvm:
-      api_user: "{{ api_user }}"
-      api_token_id: "{{ api_token_id }}"
-      api_token_secret: "{{ api_token_secret }}"
-      api_host: "{{ api_host }}"
-      node: "{{ node }}"
-      vmid: "{{ item.value.vmid }}"
-      state: stopped
-    delegate_to: "{{ proxmox }}"
-
-  - name: Sleep for 300 seconds and continue with play
-    ansible.builtin.wait_for:
-      timeout: 5 
-    delegate_to: localhost
-        
-  - name: Start VM "{{ inventory_hostname }}"
-    community.general.proxmox_kvm:
-      api_user: "{{ api_user }}"
-      api_token_id: "{{ api_token_id }}"
-      api_token_secret: "{{ api_token_secret }}"
-      api_host: "{{ api_host }}"
-      node: "{{ node }}"
-      vmid: "{{ item.value.vmid }}"
-      state: started
-    delegate_to: "{{ proxmox }}"
-
-  - name: Wait for the reboot and reconnect "{{ inventory_hostname }}"
-    ignore_unreachable: no
-    ansible.builtin.wait_for:
-      port: 22
-      host: "{{ inventory_hostname }}"
-      search_regex: OpenSSH
-      delay: "{{ wait_vm_delay }}" 
-      timeout: "{{ wait_vm_timeout }}"
-    connection: local
-
-
+#
+#  - name: Connect NIC net1 to bridge id 1 
+#    community.general.proxmox_nic:
+#      api_user: "{{ api_user }}"
+#      api_token_id: "{{ api_token_id }}"
+#      api_token_secret: "{{ api_token_secret }}"
+#      api_host: "{{ api_host }}"
+#      vmid: "{{ item.value.vmid }}"
+#      interface: "{{ item.value.interface }}" 
+#      bridge:  "{{ item.value.bridge }}"
+#      tag: "{{ item.value.tag }}"
+#      firewall: false
+#    loop: "{{ net_settings }}" 
+#
+#    delegate_to: "{{ proxmox }}"
+#        
+#  - name: Update Network Settings "{{ inventory_hostname }}" 
+#    community.general.proxmox_kvm:
+#      api_user: "{{ api_user }}"
+#      api_token_id: "{{ api_token_id }}"
+#      api_token_secret: "{{ api_token_secret }}"
+#      api_host: "{{ api_host }}"
+#      node: "{{ node }}"
+#      vmid: "{{ item.value.vmid }}"
+#      cores: '{{ cores | default(defaults.cores) }}'
+#      memory: '{{ memory_size | default(defaults.memory_size) }}'
+#      balloon: '{{ balloon | default(defaults.balloon) }}'
+#      net: '{{ net  }}'
+#      ipconfig: '{{ item.value.ipconfig }}'
+#      sshkeys: '{{ sshkeys | default(defaults.sshkeys) }}'
+#      onboot: true
+#      update: true
+#    delegate_to: "{{ proxmox }}"
+#
+#  - name: Stop VM "{{ inventory_hostname }}"
+#    community.general.proxmox_kvm:
+#      api_user: "{{ api_user }}"
+#      api_token_id: "{{ api_token_id }}"
+#      api_token_secret: "{{ api_token_secret }}"
+#      api_host: "{{ api_host }}"
+#      node: "{{ node }}"
+#      vmid: "{{ item.value.vmid }}"
+#      state: stopped
+#    delegate_to: "{{ proxmox }}"
+#
+#
