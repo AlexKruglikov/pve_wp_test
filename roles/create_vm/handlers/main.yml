@@ -1,0 +1,16 @@
+---
+# handlers file for create_vm
+
+- name: Wait for the reboot and reconnect
+  ignore_unreachable: no
+  ansible.builtin.wait_for:
+    port: 22
+    host: "{{ inventory_hostname }}"
+    search_regex: OpenSSH
+    delay: "{{ wait_vm_delay }}" 
+    timeout: "{{ wait_vm_timeout }}"
+  delegate_to: localhost
+
+- name: Ping VM's
+  ansible.builtin.ping:
+  ignore_errors: true 

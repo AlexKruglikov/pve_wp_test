@@ -1,0 +1,23 @@
+---
+- name: Cloning VMs from template 
+  hosts: vm_create_group
+  gather_facts: no
+  become: True
+  tasks:
+  - name: Clone "{{ inventory_hostname }}" from template "{{ template }}"
+    community.general.proxmox_kvm:
+      api_user: "{{ api_user }}"
+      api_token_id: "{{ api_token_id }}"
+      api_token_secret: "{{ api_token_secret }}"
+      api_host: "{{ api_host }}"
+      node: "{{ node }}"
+      clone: "{{ template }}"
+      newid: "{{ vmid }}"
+      full: "{{ full }}"
+      name: "{{ name }}"
+      bootdisk: "virtio0"
+#      ipconfig: '{{ ipconfig | default(defaults.ipconfig) }}'
+      format: 'unspecified'
+      timeout: 600
+    delegate_to: "{{ proxmox }}"
+#

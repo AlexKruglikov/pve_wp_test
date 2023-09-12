@@ -1,0 +1,6 @@
+---
+# handlers file for configure_gw
+
+- name: Execute fw script 
+  ansible.builtin.command: sh /tmp/iptables.sh      
+    

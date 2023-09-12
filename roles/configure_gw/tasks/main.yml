@@ -1,0 +1,26 @@
+---
+# tasks file for configure_gw
+
+- name: Enabling ipv4_forwarding on "{{ inventory_hostname }}"
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: true
+    state: present
+    reload: true
+    
+- name: Install iptables-persistent on "{{ inventory_hostname }}"
+  ansible.builtin.apt: 
+    name: iptables-persistent 
+    update_cache: yes 
+    lock_timeout: 120
+  register: apt_res
+  retries: 5
+  until: apt_res is success  
+
+- name: Create iptables fw script on "{{ inventory_hostname }}"
+  ansible.builtin.template:
+    src: ../../templates/gw/iptables.sh.j2
+    dest: "/tmp/iptables.sh"
+  notify: Execute fw script  
+    

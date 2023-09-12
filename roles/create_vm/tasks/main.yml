@@ -1,0 +1,94 @@
+---
+# tasks file for create_vm
+
+- name: Clone "{{ inventory_hostname }}" from template "{{ template }}"
+  community.general.proxmox_kvm:
+    api_user: "{{ api_user }}"
+    api_token_id: "{{ api_token_id }}"
+    api_token_secret: "{{ api_token_secret }}"
+    api_host: "{{ api_host }}"
+    node: "{{ node }}"
+    clone: "{{ template }}"
+    newid: "{{ vmid }}"
+    full: "{{ full }}"
+    name: "{{ name }}"
+    bootdisk: "virtio0"
+#    ipconfig: '{{ ipconfig | default(defaults.ipconfig) }}'
+    format: 'unspecified'
+    timeout: 600
+  delegate_to: "{{ proxmox }}"
+
+- name: Connect NIC to bridge 
+  community.general.proxmox_nic:
+    api_user: "{{ api_user }}"
+    api_token_id: "{{ api_token_id }}"
+    api_token_secret: "{{ api_token_secret }}"
+    api_host: "{{ api_host }}"
+    vmid: "{{ vmid }}"
+    interface: "{{ item.value.interface }}" 
+    bridge:  "{{ item.value.bridge }}"
+    tag: "{{ item.value.tag }}"
+    firewall: false
+  loop: "{{ net_settings | dict2items }}" 
+  delegate_to: "{{ proxmox }}"
+      
+- name: Update Network Settings  
+  community.general.proxmox_kvm:
+    api_user: "{{ api_user }}"
+    api_token_id: "{{ api_token_id }}"
+    api_token_secret: "{{ api_token_secret }}"
+    api_host: "{{ api_host }}"
+    node: "{{ node }}"
+    vmid: "{{ vmid }}"
+    cores: '{{ cores | default(defaults.cores) }}'
+    memory: '{{ memory_size | default(defaults.memory_size) }}'
+    balloon: '{{ balloon | default(defaults.balloon) }}'
+    ipconfig: '{{ ipconfig }}'
+    sshkeys: '{{ sshkeys | default(defaults.sshkeys) }}'
+    onboot: true
+    update: true
+  delegate_to: "{{ proxmox }}"
+  
+- name: Get VM status
+  community.general.proxmox_kvm:
+    api_user: "{{ api_user }}"
+    api_token_id: "{{ api_token_id }}"
+    api_token_secret: "{{ api_token_secret }}"
+    api_host: "{{ api_host }}"
+    node: "{{ node }}"
+    vmid: "{{ vmid }}"
+    state: current 
+  register: vm
+  delegate_to: "{{ proxmox }}"
+
+- name: Print var
+  debug:
+    msg: "{{ vm }}"
+
+- name: Spinning up VM's...
+  community.general.proxmox_kvm:
+    api_user: "{{ api_user }}"
+    api_token_id: "{{ api_token_id }}"
+    api_token_secret: "{{ api_token_secret }}"
+    api_host: "{{ api_host }}"
+    node: "{{ node }}"
+    vmid: "{{ vmid }}"
+    state: started
+  register: tmp_state
+  retries: 5
+  until: tmp_state is changed
+  when: vm.status == "stopped"
+  delegate_to: "{{ proxmox }}"
+  notify: Wait for the reboot and reconnect
+
+- name: Get VM status
+  community.general.proxmox_kvm:
+    api_user: "{{ api_user }}"
+    api_token_id: "{{ api_token_id }}"
+    api_token_secret: "{{ api_token_secret }}"
+    api_host: "{{ api_host }}"
+    node: "{{ node }}"
+    vmid: "{{ vmid }}"
+    state: current
+  register: vm
+  delegate_to: "{{ proxmox }}"

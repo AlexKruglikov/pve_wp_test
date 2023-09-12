@@ -1,0 +1,28 @@
+---
+# tasks file for install_docker
+
+#- name: Wait for /var/lib/dpkg/lock-frontend to be released 
+#  ansible.builtin.shell: while lsof /var/lib/dpkg/lock-frontend ; do sleep 10; done;
+
+- name: "Check if pkg is installed"
+  ansible.builtin.command: dpkg-query -l "{{ pkg_name }}"
+  loop: "{{ package_names }}"
+  loop_control:
+    label: "{{ pkg_name }}"
+    loop_var: pkg_name
+  register: debian_package_check
+  ignore_errors: true
+
+- name: Install Docker, Docker-compose
+  ansible.builtin.apt: 
+    name: "{{ pkg_name }}"
+    update_cache: true
+    state: latest
+    lock_timeout: 180
+  with_items: "{{ package_names }}"
+  loop_control:
+     loop_var: pkg_name
+  register: apt_res
+  retries: 10 
+  until: apt_res is success
+  when: debian_package_check is failed

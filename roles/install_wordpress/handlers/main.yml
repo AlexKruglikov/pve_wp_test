@@ -1,0 +1,7 @@
+---
+# handlers file for install_wordpress
+- name: Deploy docker-compose.yml 
+  community.docker.docker_compose:
+    project_src: /tmp/
+    files:
+    - docker-compose.yml

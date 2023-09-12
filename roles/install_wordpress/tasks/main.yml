@@ -1,0 +1,8 @@
+---
+# tasks file for install_wordpress
+- name: Create docker-compose.yml for "{{ ansible_play_batch }}"
+  ansible.builtin.template:
+    src: docker-compose.yml.j2 
+    dest: /tmp/docker-compose.yml
+  notify:
+  - Deploy docker-compose.yml 

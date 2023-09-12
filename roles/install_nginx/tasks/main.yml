@@ -1,0 +1,41 @@
+---
+# tasks file for install_nginx
+
+- name: Install nginx
+  ansible.builtin.apt: 
+    name: nginx
+    update_cache: yes 
+    lock_timeout: 180 
+  register: apt_res
+  retries: 10 
+  until: apt_res is success
+
+- name: Remove old ALB config
+  ansible.builtin.file:
+    path: /etc/nginx/sites-available/alb
+    state: absent
+
+- name: Create Nginx Config for ALB
+  ansible.builtin.template:
+    src: alb.j2
+    dest: /etc/nginx/sites-available/alb
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Link to enable configuration
+  ansible.builtin.file: 
+    dest: /etc/nginx/sites-enabled/default
+    src: /etc/nginx/sites-available/alb
+    state:  link
+
+- name: Restart Nginx
+  ansible.builtin.service: 
+    name: nginx 
+    state: restarted
+    enabled: true
+
+- name: Check for Nginx status
+  ansible.builtin.service_facts:
+- debug:
+    var: ansible_facts.services.nginx.state

@@ -1,0 +1,5 @@
+---
+# vars file for install_docker
+
+package_names:
+  - docker-compose
