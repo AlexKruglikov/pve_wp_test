@@ -2,7 +2,7 @@ iptables -F; iptables -t nat -F; iptables -t mangle -F
 iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD ACCEPT
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -t nat -I PREROUTING -p tcp -m multiport --dports 80,443 -i eth0 -j DNAT --to-destination 10.0.10.10
+iptables -t nat -I PREROUTING -p tcp -m multiport --dports 80,443 -i eth0 -j DNAT --to-destination {{ groups['nginx'][0] }}
 
 {% for subnet in backend_subnets %}
 iptables -t nat -A POSTROUTING  -s {{ subnet }} -j MASQUERADE
